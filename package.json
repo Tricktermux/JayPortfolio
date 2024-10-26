@@ -4,7 +4,7 @@
   "description": "A simple Node.js application serving an HTML file using Express.js",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js"
+    "start": "node index.js"
   },
   "keywords": [],
   "author": "Kenneth Panio",
