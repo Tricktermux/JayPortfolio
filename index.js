@@ -5,7 +5,7 @@
    const app = express();
 
    app.get('/', (req, res) => {
-       res.sendFile(path.join(__dirname, 'portfolio.html'));
+       res.sendFile(path.join(__dirname, 'public', 'portfolio.html'));
    });
 
    const PORT = process.env.PORT || 25701;
