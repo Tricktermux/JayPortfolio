@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HACKED BY HAJIME</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            margin: 0;
+            padding: 0;
+            background: black;
+            color: #00ff00;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+            animation: fadeIn 2s ease-in;
+        }
+@keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        .glitch {
+            font-size: 3em;
+            position: relative;
+            color: #00ff00;
+            animation: glitch 1s infinite;
+        }
+@keyframes glitch {
+            0%, 100% {
+                text-shadow: 2px 2px #ff0000, -2px -2px #0000ff;
+            }
+            20%, 80% {
+                text-shadow: -2px -2px #ff0000, 2px 2px #0000ff;
+            }
+            40%, 60% {
+                text-shadow: 2px -2px #ff0000, -2px 2px #0000ff;
+            }
+        }
+        .profile {
+            font-size: 0.4em;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .profile img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 4px solid #00ff00;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+        }
+        .profile img.beat {
+            transform: scale(1.1);
+            box-shadow: 0 0 25px rgba(0, 255, 0, 0.8);
+        }
+        .description {
+            color: red;
+            max-width: 600px;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 0.8em;
+            line-height: 1.6;
+            overflow: auto;
+        }
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrix"></canvas>
+    <div class="profile">
+        <img src="anonymous.png" alt="Profile Picture" id="profile-pic">
+        <h1 class="glitch">HACKED BY KENNETH PANIO :(</h1>
+    </div>
+    <div class="description">
+        <p id="typing-text"></p>
+    </div>
+    <audio id="audio" loop>
+        <source src="funkdd.mp3" type="audio/mpeg">
+    </audio>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var audio = document.getElementById("audio");
+            var profilePic = document.getElementById("profile-pic");
+            var audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            var analyser = audioContext.createAnalyser();
+            var source = audioContext.createMediaElementSource(audio);
+            source.connect(analyser);
+            analyser.connect(audioContext.destination);
+            analyser.fftSize = 256;
+            var bufferLength = analyser.frequencyBinCount;
+            var dataArray = new Uint8Array(bufferLength);
+
+            function animate() {
+                requestAnimationFrame(animate);
+                analyser.getByteFrequencyData(dataArray);
+                var sum = dataArray.reduce((a, b) => a + b, 0);
+                var average = sum / bufferLength;
+                if (average > 100) {
+                    profilePic.classList.add('beat');
+                } else {
+                    profilePic.classList.remove('beat');
+                }
+            }
+
+            var playPromise = audio.play();
+            if (playPromise !== undefined) {
+                playPromise.then(_ => {
+                    audioContext.resume().then(() => {
+                        animate();
+                    });
+                }).catch(error => {
+                    window.addEventListener("click", function() {
+                        audio.play();
+                        audioContext.resume().then(() => {
+                            animate();
+                        });
+                    });
+                });
+            }
+
+            var text = "Hey there, I just wanted to let you know that your website is currently under attack. I've been able to infiltrate your system and I'm using it to spread malware and steal sensitive information. You need to take action now to secure your site and protect your users. Don't wait, act now!";
+            var index = 0;
+            var typingTextElement = document.getElementById("typing-text");
+
+            function type() {
+                if (index < text.length) {
+                    typingTextElement.innerHTML += text.charAt(index);
+                    index++;
+                    setTimeout(type, 50);
+                }
+            }
+            type();
+
+            // Matrix effect
+            var canvas = document.getElementById('matrix');
+            var ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            var matrix = "01";
+            matrix = matrix.split("");
+            var font_size = 10;
+            var columns = canvas.width / font_size;
+            var drops = [];
+            for (var x = 0; x < columns; x++) drops[x] = 1;
+
+            function draw() {
+                ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = "#0F0";
+                ctx.font = font_size + "px arial";
+                for (var i = 0; i < drops.length; i++) {
+                    var text = matrix[Math.floor(Math.random() * matrix.length)];
+                    ctx.fillText(text, i * font_size, drops[i] * font_size);
+                    if (drops[i] * font_size > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                    drops[i]++;
+                }
+            }
+            setInterval(draw, 33);
+        });
+    </script>
+</body>
+</html>

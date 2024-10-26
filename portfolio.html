@@ -10,7 +10,7 @@
             font-family: 'Arial', sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #121212;
+            background: linear-gradient(135deg, #1e1e1e, #121212);
             color: white;
             display: flex;
             flex-direction: column;
@@ -32,20 +32,26 @@
             height: 150px;
             border-radius: 50%;
             border: 4px solid orange;
-            transition: transform 0.3s;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 0 15px rgba(255, 165, 0, 0.5);
         }
-        .profile img:hover {
+        .profile img.beat {
             transform: scale(1.1);
+            box-shadow: 0 0 25px rgba(255, 165, 0, 0.8);
         }
         .profile h1 {
             margin: 10px 0;
-            font-size: 2em;
+            font-size: 1.0em;
+            color: #ffcc00;
         }
         .description {
+            font-family: Monospace;
             max-width: 600px;
             text-align: center;
             margin-bottom: 30px;
             animation: slideIn 1s ease-in;
+            font-size: 0.8em;
+            line-height: 1.6;
         }
         @keyframes slideIn {
             from { transform: translateY(-20px); opacity: 0; }
@@ -60,8 +66,10 @@
             margin-bottom: 15px;
         }
         .skill-name {
+            font-size: 0.8em;
             font-weight: bold;
             margin-bottom: 5px;
+            color: #ffcc00;
         }
         .skill-bar {
             background-color: #333;
@@ -72,17 +80,21 @@
         }
         .skill-level {
             height: 100%;
-            background-color: orange;
+            background: linear-gradient(90deg, orange, #ffcc00);
             text-align: right;
             padding-right: 5px;
             color: white;
             line-height: 20px;
             width: 0;
-            animation: fill 1s forwards;
+            animation: fill 1s forwards, glow 1.5s infinite alternate;
         }
         @keyframes fill {
             from { width: 0; }
             to { width: var(--skill-level); }
+        }
+        @keyframes glow {
+            from { box-shadow: 0 0 5px rgba(255, 165, 0, 0.5); }
+            to { box-shadow: 0 0 20px rgba(255, 165, 0, 1); }
         }
         .projects {
             display: flex;
@@ -92,6 +104,8 @@
             margin-bottom: 40px;
         }
         .project {
+            font-family: Monospace;
+            font-size: 0.8em;
             background-color: #1e1e1e;
             padding: 20px;
             border-radius: 8px;
@@ -104,6 +118,7 @@
         .project:hover {
             transform: translateY(-5px);
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            color: yellow;
         }
         .project h2 {
             margin: 10px 0;
@@ -111,15 +126,29 @@
         }
         .contact {
             text-align: center;
+            margin-top: 20px;
         }
-        .contact a {
-            color: orange;
-            text-decoration: none;
+        .contact-button {
+            background-color: #ffcc00;
+            color: #121212;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1em;
             font-weight: bold;
-            transition: color 0.3s;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
-        .contact a:hover {
-            color: #ffcc00;
+        .contact-button:hover {
+            background-color: #ff5722;
+            transform: translateY(-2px);
+        }
+        .icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+            filter: invert(100%);
         }
         @media (max-width: 600px) {
             .projects {
@@ -131,7 +160,7 @@
 </head>
 <body>
     <div class="profile">
-        <img src="hajime.jpg" alt="Profile Picture">
+        <img src="duck.gif" alt="Profile Picture" id="profile-pic">
         <h1>Kenneth Panio</h1>
     </div>
     <div class="description">
@@ -147,13 +176,7 @@
         <div class="skill">
             <div class="skill-name">Python</div>
             <div class="skill-bar">
-                <div class="skill-level" style="--skill-level: 45%;">45%</div>
-            </div>
-        </div>
-                <div class="skill">
-            <div class="skill-name">Mojo</div>
-            <div class="skill-bar">
-                <div class="skill-level" style="--skill-level: 40%;">40%</div>
+                <div class="skill-level" style="--skill-level: 80%;">80%</div>
             </div>
         </div>
         <div class="skill">
@@ -166,6 +189,12 @@
             <div class="skill-name">Bash Scripting</div>
             <div class="skill-bar">
                 <div class="skill-level" style="--skill-level: 100%;">100%</div>
+            </div>
+        </div>
+        <div class="skill">
+            <div class="skill-name">Kotlin</div>
+            <div class="skill-bar">
+                <div class="skill-level" style="--skill-level: 35%;">35%</div>
             </div>
         </div>
     </div>
@@ -184,7 +213,7 @@
         </div>
     </div>
     <div class="contact">
-        <p>Contact me: <a href="mailto:lkpanio25@gmail.com">lkpanio25@gmail.com</a></p>
+        <button onclick="window.location.href='mailto:lkpanio25@gmail.com'" class="contact-button">Contact Me</button>
     </div>
     <audio id="audio" loop>
         <source src="funkdd.mp3" type="audio/mpeg">
@@ -192,11 +221,40 @@
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             var audio = document.getElementById("audio");
+            var profilePic = document.getElementById("profile-pic");
+            var audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            var analyser = audioContext.createAnalyser();
+            var source = audioContext.createMediaElementSource(audio);
+            source.connect(analyser);
+            analyser.connect(audioContext.destination);
+            analyser.fftSize = 256;
+            var bufferLength = analyser.frequencyBinCount;
+            var dataArray = new Uint8Array(bufferLength);
+
+            function animate() {
+                requestAnimationFrame(animate);
+                analyser.getByteFrequencyData(dataArray);
+                var sum = dataArray.reduce((a, b) => a + b, 0);
+                var average = sum / bufferLength;
+                if (average > 100) {
+                    profilePic.classList.add('beat');
+                } else {
+                    profilePic.classList.remove('beat');
+                }
+            }
+
             var playPromise = audio.play();
             if (playPromise !== undefined) {
-                playPromise.then(_ => {}).catch(error => {
+                playPromise.then(_ => {
+                    audioContext.resume().then(() => {
+                        animate();
+                    });
+                }).catch(error => {
                     window.addEventListener("click", function() {
                         audio.play();
+                        audioContext.resume().then(() => {
+                            animate();
+                        });
                     });
                 });
             }
