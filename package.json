@@ -7,6 +7,7 @@
     "start": "node index.js"
   },
   "keywords": [],
+  "multer": "1.4.5-lts.1",
   "author": "Kenneth Panio",
   "license": "ISC",
   "dependencies": {
