@@ -1,9 +1,9 @@
-
 const express = require('express');
 const path = require('path');
 const multer = require('multer');
 const fs = require('fs');
 const app = express();
+
 const uploadDir = path.join(__dirname, 'public', 'records', 'pics');
 
 // Ensure the upload directory exists
@@ -11,30 +11,25 @@ if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-// Set up multer storage
+// Set up multer storage with automatic file extension
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, uploadDir);
-    },
+    destination: (req, file, cb) => cb(null, uploadDir),
     filename: (req, file, cb) => {
-        cb(null, Date.now() + path.extname(file.originalname) || ".jpg");
+        const ext = path.extname(file.originalname) || '.jpg'; // Default to '.jpg' if no extension
+        cb(null, `${Date.now()}${ext}`);
     }
 });
 
 // File filter for allowed types
 const fileFilter = (req, file, cb) => {
     const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
-    if (allowedTypes.includes(file.mimetype)) {
-        cb(null, true);
-    } else {
-        cb(new Error('Invalid file type. Only JPEG, PNG, and GIF are allowed.'), false);
-    }
+    cb(null, allowedTypes.includes(file.mimetype) ? true : new Error('Invalid file type. Only JPEG, PNG, and GIF are allowed.'));
 };
 
-// Set up multer
+// Configure multer
 const upload = multer({
-    storage: storage,
-    fileFilter: fileFilter,
+    storage,
+    fileFilter,
     limits: { fileSize: 5 * 1024 * 1024 }
 });
 
@@ -49,7 +44,7 @@ app.post('/upload', upload.single('image'), (req, res) => {
     res.json({ message: "Image uploaded successfully!", filename: req.file.filename, filePath: `/records/pics/${req.file.filename}` });
 });
 
-// New endpoint to list all files
+// Endpoint to list all files
 app.get('/files', (req, res) => {
     fs.readdir(uploadDir, (err, files) => {
         if (err) {
@@ -57,12 +52,13 @@ app.get('/files', (req, res) => {
         }
         const fileList = files.map(file => ({
             name: file,
-            path: `/records/pics/${file}`
+            path: `/records/pics/${file}` // Full filename with extension
         }));
         res.json(fileList);
     });
 });
 
+// Serve portfolio page
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'portfolio.html'));
 });
